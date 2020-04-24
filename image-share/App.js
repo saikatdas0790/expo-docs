@@ -1,48 +1,7 @@
 import React, { useState } from "react";
 import { Image, StyleSheet, Text, View, TouchableOpacity } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-
-export default function App() {
-  const [selectedImage, setSelectedImage] = useState(null);
-
-  const openImagePickerAsync = async () => {
-    const permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
-
-    if (permissionResult.granted === false) {
-      alert("Permission to access camera roll is required!");
-      return;
-    }
-
-    const pickerResult = await ImagePicker.launchImageLibraryAsync();
-
-    if (pickerResult.cancelled === true) return;
-
-    setSelectedImage({ localUri: pickerResult.uri });
-  };
-
-  return selectedImage ? (
-    <View style={styles.container}>
-      <Image
-        source={{ uri: selectedImage.localUri }}
-        style={styles.thumbnail}
-      ></Image>
-    </View>
-  ) : (
-    <View style={styles.container}>
-      <Image
-        source={{ uri: "https://i.imgur.com/TkIrScD.png" }}
-        style={styles.logo}
-      ></Image>
-      <Text style={styles.instructions}>
-        To share a photo from your phone with a friend, just press the button
-        below!
-      </Text>
-      <TouchableOpacity onPress={openImagePickerAsync} style={styles.button}>
-        <Text style={styles.buttonText}>Pick a photo</Text>
-      </TouchableOpacity>
-    </View>
-  );
-}
+import * as Sharing from "expo-sharing";
 
 const styles = StyleSheet.create({
   container: {
@@ -69,3 +28,55 @@ const styles = StyleSheet.create({
     resizeMode: "contain",
   },
 });
+
+export default function App() {
+  const [selectedImage, setSelectedImage] = useState(null);
+
+  const openImagePickerAsync = async () => {
+    const permissionResult = await ImagePicker.requestCameraRollPermissionsAsync();
+
+    if (permissionResult.granted === false) {
+      alert("Permission to access camera roll is required!");
+      return;
+    }
+
+    const pickerResult = await ImagePicker.launchImageLibraryAsync();
+
+    if (pickerResult.cancelled === true) return;
+
+    setSelectedImage({ localUri: pickerResult.uri });
+  };
+
+  const openShareDialogAsync = async () => {
+    if (!(await Sharing.isAvailableAsync()))
+      return alert(`Uh oh, sharing isn't available on your platform`);
+
+    Sharing.shareAsync(selectedImage.localUri);
+  };
+
+  return selectedImage ? (
+    <View style={styles.container}>
+      <Image
+        source={{ uri: selectedImage.localUri }}
+        style={styles.thumbnail}
+      ></Image>
+      <TouchableOpacity onPress={openShareDialogAsync} style={styles.button}>
+        <Text style={styles.buttonText}>Share this photo</Text>
+      </TouchableOpacity>
+    </View>
+  ) : (
+    <View style={styles.container}>
+      <Image
+        source={{ uri: "https://i.imgur.com/TkIrScD.png" }}
+        style={styles.logo}
+      ></Image>
+      <Text style={styles.instructions}>
+        To share a photo from your phone with a friend, just press the button
+        below!
+      </Text>
+      <TouchableOpacity onPress={openImagePickerAsync} style={styles.button}>
+        <Text style={styles.buttonText}>Pick a photo</Text>
+      </TouchableOpacity>
+    </View>
+  );
+}
