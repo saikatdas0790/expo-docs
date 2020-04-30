@@ -1,15 +1,9 @@
 import React, { useState } from "react";
-import {
-  Image,
-  StyleSheet,
-  Text,
-  View,
-  TouchableOpacity,
-  Platform,
-} from "react-native";
+import { Image, StyleSheet, Text, View, Platform } from "react-native";
 import * as ImagePicker from "expo-image-picker";
 import * as Sharing from "expo-sharing";
 import uploadToAnonymousFilesAsync from "anonymous-files";
+import Button from "./Button";
 
 const styles = StyleSheet.create({
   container: {
@@ -28,8 +22,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     marginHorizontal: 15,
   },
-  button: { backgroundColor: "blue", padding: 20, borderRadius: 5 },
-  buttonText: { fontSize: 20, color: "#fff" },
   thumbnail: {
     width: 300,
     height: 300,
@@ -75,9 +67,14 @@ export default function App() {
         source={{ uri: selectedImage.localUri }}
         style={styles.thumbnail}
       ></Image>
-      <TouchableOpacity onPress={openShareDialogAsync} style={styles.button}>
-        <Text style={styles.buttonText}>Share this photo</Text>
-      </TouchableOpacity>
+      <Button
+        onPress={openShareDialogAsync}
+        textToShow="Share this photo"
+      ></Button>
+      <Button
+        onPress={() => setSelectedImage(null)}
+        textToShow="Clear selected image"
+      ></Button>
     </View>
   ) : (
     <View style={styles.container}>
@@ -89,9 +86,7 @@ export default function App() {
         To share a photo from your phone with a friend, just press the button
         below!
       </Text>
-      <TouchableOpacity onPress={openImagePickerAsync} style={styles.button}>
-        <Text style={styles.buttonText}>Pick a photo</Text>
-      </TouchableOpacity>
+      <Button onPress={openImagePickerAsync} textToShow="Pick a photo"></Button>
     </View>
   );
 }
